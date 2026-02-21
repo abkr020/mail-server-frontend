@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-// import Login from "./Login";
-// import { useAuth } from "./AuthContext";
 import Login from "./pages/Login";
+import MailInbox from "./pages/MailInbox";
 import { useAuth } from "./context/AuthContext";
 
 function App() {
@@ -12,36 +11,24 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Route */}
+        {/* Public */}
         <Route
           path="/login"
-          element={!user ? <Login /> : <Navigate to="/" />}
+          element={!user ? <Login /> : <Navigate to="/mails" />}
         />
 
-        {/* Protected Route */}
+        {/* Protected */}
         <Route
-          path="/"
-          element={user ? <Dashboard /> : <Navigate to="/login" />}
+          path="/mails"
+          element={user ? <MailInbox /> : <Navigate to="/login" />}
         />
 
-        {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* Default */}
+        <Route path="/" element={<Navigate to="/mails" />} />
+        <Route path="*" element={<Navigate to="/mails" />} />
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
-
-/* Simple dashboard component */
-function Dashboard() {
-  const { user, logout } = useAuth();
-
-  return (
-    <div style={{ padding: 40 }}>
-      <h1>Welcome {user.name}</h1>
-      <p>{user.email}</p>
-      <button onClick={logout}>Logout</button>
-    </div>
-  );
-}
