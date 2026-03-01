@@ -129,7 +129,7 @@ export default function MailInbox() {
                         <span style={s.bar} />
                     </div>
                     <span style={s.logoMailPrefix}>SLV</span>
-                    <span style={s.logoMail}>SLVM</span>
+                    <span style={s.logoMail}>M</span>
                     <span style={s.logoText}>ail</span>
                 </div>
 
