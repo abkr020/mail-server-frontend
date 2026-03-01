@@ -128,7 +128,8 @@ export default function MailInbox() {
                         <span style={s.bar} />
                         <span style={s.bar} />
                     </div>
-                    <span style={s.logoMail}>M</span>
+                    <span style={s.logoMailPrefix}>SLV</span>
+                    <span style={s.logoMail}>SLVM</span>
                     <span style={s.logoText}>ail</span>
                 </div>
 
@@ -387,6 +388,15 @@ const s = {
         height: 2,
         background: "#5f6368",
         borderRadius: 2,
+    },
+    logoMailPrefix: {
+        fontSize: 28,
+        fontWeight: 700,
+        background: "linear-gradient(90deg, #EA4335, #FBBC05)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        lineHeight: 1,
+        letterSpacing: -1,
     },
     logoMail: {
         fontSize: 28,
