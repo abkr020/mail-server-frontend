@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { API_BASE_URL } from "../config";
+import { API_BASE_URL, EMAIL_DOMAIN } from "../config";
 
 export default function Login() {
   const { login: authLogin } = useAuth();
@@ -26,14 +26,16 @@ export default function Login() {
     setError("");
     setSuccess("");
   };
-
+  const buildEmail = (username) => {
+    return `${username.trim().replace(/@.*/g, "").toLowerCase()}@${EMAIL_DOMAIN}`;
+  };
   /* ── LOGIN ── */
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      await authLogin(`${loginUsername}@slvai.tech`, loginPassword);
+      await authLogin(buildEmail(loginUsername), loginPassword);
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {
@@ -57,7 +59,7 @@ export default function Login() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: signupName || signupUsername,
-          email: `${signupUsername}@slvai.tech`,
+          email: `${signupUsername}@${EMAIL_DOMAIN}`,
           password: signupPassword,
         }),
       });
@@ -65,7 +67,7 @@ export default function Login() {
       if (!res.ok) throw new Error(data.message || "Signup failed");
 
       setSuccess("Account created! Signing you in…");
-      await authLogin(`${signupUsername}@slvai.tech`, signupPassword);
+      await authLogin(`${signupUsername}@${EMAIL_DOMAIN}`, signupPassword);
     } catch (err) {
       setError(err.message || "Signup failed");
       setSuccess("");
@@ -319,7 +321,7 @@ export default function Login() {
         <div style={s.logoWrap}>
           <div style={s.logoBadge}>M</div>
           <span style={s.logoTitle}>slvai mail</span>
-          <span style={s.logoSub}>@slvai.tech workspace</span>
+          <span style={s.logoSub}>@{EMAIL_DOMAIN} workspace</span>
         </div>
 
         {/* Tabs */}
@@ -348,7 +350,7 @@ export default function Login() {
                   autoComplete="username"
                   required
                 />
-                <div style={s.emailSuffix}>@slvai.tech</div>
+                <div style={s.emailSuffix}>@{EMAIL_DOMAIN}</div>
               </div>
             </div>
 
@@ -412,11 +414,11 @@ export default function Login() {
                   autoComplete="username"
                   required
                 />
-                <div style={s.emailSuffix}>@slvai.tech</div>
+                <div style={s.emailSuffix}>@{EMAIL_DOMAIN}</div>
               </div>
               {signupUsername && (
                 <div style={s.previewText}>
-                  ✦ <strong>{signupUsername}@slvai.tech</strong>
+                  ✦ <strong>{signupUsername}@{EMAIL_DOMAIN}</strong>
                 </div>
               )}
             </div>
