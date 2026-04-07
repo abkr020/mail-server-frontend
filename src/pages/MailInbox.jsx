@@ -1,18 +1,18 @@
 import { useEffect, useState, useRef } from "react";
-import { API_BASE_URL ,EMAIL_DOMAIN_SUB_COMPANY_NAME} from "../config";
+import { API_BASE_URL, EMAIL_DOMAIN_SUB_COMPANY_NAME } from "../config";
 import { useAuth } from "../context/AuthContext";
 import {
-  InboxIcon,
-  SendIcon,
-  PencilIcon,
-  ChevronDown,
-  XIcon,
-  SearchIcon,
-  MinimizeIcon,
-  MaximizeIcon,
-  PaperclipIcon,
-  SunIcon,
-  MoonIcon
+    InboxIcon,
+    SendIcon,
+    PencilIcon,
+    ChevronDown,
+    XIcon,
+    SearchIcon,
+    MinimizeIcon,
+    MaximizeIcon,
+    PaperclipIcon,
+    SunIcon,
+    MoonIcon
 } from "../components/Icons";
 
 
@@ -40,7 +40,7 @@ export default function MailInbox() {
     const [sendSuccess, setSendSuccess] = useState(false);
     const userMenuRef = useRef(null);
     const fileInputRef = useRef(null); // ── NEW: ref for hidden file input
-
+    const [previewFile, setPreviewFile] = useState(null);
     /* ── Fetch inbox ── */
     useEffect(() => {
         Promise.all([
@@ -161,7 +161,23 @@ export default function MailInbox() {
             ? d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
             : d.toLocaleDateString([], { month: "short", day: "numeric" });
     };
-
+    const handleComposeKeyDown = (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+            e.preventDefault();
+            if (!compose.to) {
+                alert("send to not mentioned")
+            }
+            // if (!compose.text) {
+            //     alert("you can not send the empty message")
+            // }
+            if (!compose.subject) {
+                alert("subbject not mentioned")
+            }
+            if (!sending && compose.to && compose.text) {
+                sendMail();
+            }
+        }
+    };
     // ── Build dynamic style object based on dark flag ──
     const t = theme(dark);
 
@@ -343,7 +359,11 @@ export default function MailInbox() {
                     ...t.composeWindow,
                     ...(composeMaximized ? t.composeMaximized : {}),
                     ...(composeMinimized ? t.composeMinimized : {}),
-                }}>
+
+                }}
+                    onKeyDown={handleComposeKeyDown} // 👈 ADD HERE
+
+                >
                     <div style={t.composeHeader}>
                         <span style={t.composeTitle}>New Message</span>
                         <div style={t.composeActions}>
@@ -392,7 +412,7 @@ export default function MailInbox() {
                                     {attachments.map((file, idx) => (
                                         <div key={idx} style={t.attachmentChip}>
                                             <PaperclipIcon />
-                                            <span style={t.attachmentName} title={file.name}>
+                                            <span style={t.attachmentName} title={file.name} onClick={() => setPreviewFile(file)}>
                                                 {file.name.length > 20 ? file.name.slice(0, 18) + "…" : file.name}
                                             </span>
                                             <span style={t.attachmentSize}>{formatFileSize(file.size)}</span>
@@ -437,13 +457,55 @@ export default function MailInbox() {
                                     disabled={sending || !compose.to}
                                 >
                                     {sending ? "Sending…" : "Send"}
+                                    <span style={{ marginLeft: 8, fontSize: 12, opacity: 0.7 }}>
+                                        ⌘ / Ctrl + Enter
+                                    </span>
                                 </button>
                             </div>
                         </>
                     )}
                 </div>
+            )
+            }
+            {/* preview of file attached */}
+            {previewFile && (
+                <div style={t.previewOverlay} onClick={() => setPreviewFile(null)}>
+                    <div style={t.previewBox} onClick={(e) => e.stopPropagation()}>
+                        <button style={t.previewClose} onClick={() => setPreviewFile(null)}>
+                            <XIcon />
+                        </button>
+
+                        {previewFile.type.startsWith("image/") && (
+                            <img
+                                src={URL.createObjectURL(previewFile)}
+                                style={t.previewImage}
+                            />
+                        )}
+
+                        {previewFile.type === "application/pdf" && (
+                            <iframe
+                                src={URL.createObjectURL(previewFile)}
+                                style={t.previewIframe}
+                                title="PDF Preview"
+                            />
+                        )}
+
+                        {!previewFile.type.startsWith("image/") &&
+                            previewFile.type !== "application/pdf" && (
+                                <div style={t.previewFallback}>
+                                    <p>No preview available</p>
+                                    <a
+                                        href={URL.createObjectURL(previewFile)}
+                                        download={previewFile.name}
+                                    >
+                                        Download File
+                                    </a>
+                                </div>
+                            )}
+                    </div>
+                </div>
             )}
-        </div>
+        </div >
     );
 }
 
@@ -1031,6 +1093,7 @@ function theme(dark) {
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             maxWidth: 110,
+            cursor: "pointer"
         },
         attachmentSize: {
             color: c.textMuted,
@@ -1091,6 +1154,52 @@ function theme(dark) {
             fontSize: 13,
             flex: 1,
             fontWeight: 600,
+        },
+        previewOverlay: {
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 2000,
+        },
+
+        previewBox: {
+            width: "80%",
+            height: "80%",
+            background: "#000",
+            borderRadius: 10,
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+        },
+
+        previewClose: {
+            position: "absolute",
+            top: 10,
+            right: 10,
+            background: "none",
+            border: "none",
+            color: "#fff",
+            cursor: "pointer",
+        },
+
+        previewImage: {
+            maxWidth: "100%",
+            maxHeight: "100%",
+        },
+
+        previewIframe: {
+            width: "100%",
+            height: "100%",
+            border: "none",
+        },
+
+        previewFallback: {
+            color: "#fff",
+            textAlign: "center",
         },
     };
 }
