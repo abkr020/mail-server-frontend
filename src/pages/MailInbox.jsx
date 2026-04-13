@@ -255,7 +255,7 @@ export default function MailInbox() {
                     </button>
 
                     <nav style={t.nav}>
-                        <button
+                        <button id="guide_view_inbox_mails_button"
                             style={{ ...t.navItem, ...(view === "inbox" ? t.navItemActive : {}) }}
                             onClick={() => { setView("inbox"); setSelected(null); }}
                         >
@@ -263,7 +263,7 @@ export default function MailInbox() {
                             <span>Inbox</span>
                             {mails.length > 0 && <span style={t.badge}>{mails.length}</span>}
                         </button>
-                        <button
+                        <button id="guide_view_sent_mails_button"
                             style={{ ...t.navItem, ...(view === "sent" ? t.navItemActive : {}) }}
                             onClick={() => { setView("sent"); setSelected(null); }}
                         >
