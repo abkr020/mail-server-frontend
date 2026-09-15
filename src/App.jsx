@@ -7,6 +7,10 @@ function App() {
   const { user, loading } = useAuth();
 
   if (loading) return <p>Loading...</p>;
+console.log("__GIT_COMMIT__",__GIT_COMMIT__);
+console.log("__GIT_BRANCH__",__GIT_BRANCH__);
+console.log("__GIT_COMMIT_DATE__",__GIT_COMMIT_DATE__);
+console.log("__BUILD_DATE__",__BUILD_DATE__);
 
   return (
     <BrowserRouter>
